@@ -162,8 +162,13 @@ def discover_files_matching(start_dir, file_glob):
             if fnmatch.fnmatch(file_name, file_glob):
                 yield os.path.join(root, file_name)
 
+
 def _temp_opener(name, flag, mode=0o777):
-    return os.open(name, flag | os.O_TEMPORARY, mode)
+    if sys.platform.startswith('win'):
+        return os.open(name, flag | os.O_TEMPORARY, mode)
+    else:
+        return os.open(name, flag, mode)
+
 
 def execute_command(command_and_arguments, outfile_name=None, env=None, cwd=None, error_file_name=None, shell=False):
     if error_file_name is None and outfile_name:
