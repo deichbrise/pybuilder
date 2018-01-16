@@ -163,20 +163,22 @@ def discover_files_matching(start_dir, file_glob):
                 yield os.path.join(root, file_name)
 
 
-def _temp_opener(name, flag, mode=0o777):
-    if sys.platform.startswith('win'):
-        return os.open(name, flag | os.O_TEMPORARY, mode)
-    else:
-        return os.open(name, flag, mode)
-
-
 def execute_command(command_and_arguments, outfile_name=None, env=None, cwd=None, error_file_name=None, shell=False):
     if error_file_name is None and outfile_name:
-        error_file_name = outfile_name + ".err"
+        if hasattr(outfile_name, "read"):
+            error_file_name = outfile_name.name + ".err"
+        else:
+            error_file_name = outfile_name + ".err"
 
-    out_file = open(outfile_name, "w", opener=_temp_opener) if outfile_name else None
+    if hasattr(outfile_name, "read"):
+        out_file = outfile_name
+    else:
+        out_file = open(outfile_name, "w") if outfile_name else None
     try:
-        error_file = open(error_file_name, "w", opener=_temp_opener) if error_file_name else None
+        if hasattr(error_file_name, "read"):
+            error_file = error_file_name
+        else:
+            error_file = open(error_file_name, "w") if error_file_name else None
         try:
             process = Popen(command_and_arguments,
                             stdout=out_file,
@@ -222,6 +224,8 @@ def assert_can_execute(command_and_arguments, prerequisite, caller):
 
 
 def read_file(file_name):
+    if hasattr(file_name, "read"):
+        return file_name.readlines()
     with open(file_name, "r") as file_handle:
         return file_handle.readlines()
 

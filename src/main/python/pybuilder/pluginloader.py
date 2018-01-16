@@ -165,8 +165,8 @@ def _install_external_plugin(project, name, version, logger, plugin_module_name,
         pip_package = name.replace(VCS_PLUGIN_PROTOCOL, "")
         force_reinstall = True
 
-    with tempfile.NamedTemporaryFile(delete=True) as log_file:
-        log_file_name = log_file.name
+    with tempfile.NamedTemporaryFile(mode="rw+b", delete=True) as log_file:
+
         result = pip_utils.pip_install(
             install_targets=pip_package,
             index_url=project.get_property("install_dependencies_index_url"),
@@ -175,11 +175,11 @@ def _install_external_plugin(project, name, version, logger, plugin_module_name,
             upgrade=upgrade,
             force_reinstall=force_reinstall,
             logger=logger,
-            outfile_name=log_file_name,
-            error_file_name=log_file_name,
+            outfile_name=log_file,
+            error_file_name=log_file,
             cwd=".")
         if result != 0:
-            logger.error("The following pip error was encountered:\n" + "".join(read_file(log_file_name)))
+            logger.error("The following pip error was encountered:\n" + "".join(read_file(log_file)))
             message = "Failed to install plugin from {0}".format(pip_package)
             raise MissingPluginException(name, message)
 
