@@ -162,12 +162,14 @@ def discover_files_matching(start_dir, file_glob):
             if fnmatch.fnmatch(file_name, file_glob):
                 yield os.path.join(root, file_name)
 
+def _temp_opener(name, flag, mode=0o777S):
+    return os.open(name, flag | os.O_TEMPORARY, mode)
 
 def execute_command(command_and_arguments, outfile_name=None, env=None, cwd=None, error_file_name=None, shell=False):
     if error_file_name is None and outfile_name:
         error_file_name = outfile_name + ".err"
 
-    out_file = open(outfile_name, "w") if outfile_name else None
+    out_file = open(outfile_name, "w", opener=_temp_opener) if outfile_name else None
     try:
         error_file = open(error_file_name, "w") if error_file_name else None
         try:
