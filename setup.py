@@ -1,56 +1,78 @@
 #!/usr/bin/env python
-#
 
-#   -*- coding: utf-8 -*-
-#
-#   This file is part of PyBuilder
-#
-#   Copyright 2011-2015 PyBuilder Team
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+from setuptools import setup
+from setuptools.command.install import install as _install
 
-#
-# This script allows to support installation via:
-#   pip install git+git://github.com/pybuilder/pybuilder.git@<branch>
-#
-# This script is designed to be used in combination with `pip install` ONLY
-#
-# DO NOT RUN MANUALLY
-#
+class install(_install):
+    def pre_install_script(self):
+        pass
 
-import os
-import subprocess
-import sys
-import glob
-import shutil
+    def post_install_script(self):
+        pass
 
-script_dir = os.path.dirname(os.path.realpath(__file__))
-build_script = os.path.join(script_dir, "build.py")
-exit_code = 0
-try:
-    subprocess.check_call([sys.executable, build_script, "clean", "install_dependencies", "package", "-o"])
-    dist_dir = glob.glob(os.path.join(script_dir, "target", "dist", "*"))[0]
-    for src_file in glob.glob(os.path.join(dist_dir, "*")):
-        file_name = os.path.basename(src_file)
-        target_file_name = os.path.join(script_dir, file_name)
-        if os.path.exists(target_file_name):
-            if os.path.isdir(target_file_name):
-                os.removedirs(target_file_name)
-            else:
-                os.remove(target_file_name)
-        shutil.move(src_file, script_dir)
-    setup_args = sys.argv[1:]
-    subprocess.check_call([sys.executable, "setup.py"] + setup_args, cwd=script_dir)
-except subprocess.CalledProcessError as e:
-    exit_code = e.returncode
-sys.exit(exit_code)
+    def run(self):
+        self.pre_install_script()
+
+        _install.run(self)
+
+        self.post_install_script()
+
+if __name__ == '__main__':
+    setup(
+        name = 'pybuilder',
+        version = '0.12.0.dev20180116151215',
+        description = 'An extensible, easy to use continuous build tool for Python',
+        long_description = 'PyBuilder is a build automation tool for python.\n\nPyBuilder is a software build tool written in pure Python which mainly targets Python applications.\nIt is based on the concept of dependency based programming but also comes along with powerful plugin mechanism that\nallows the construction of build life cycles similar to those known from other famous build tools like Apache Maven.\n',
+        author = 'Alexander Metzner, Maximilien Riehl, Michael Gruber, Udo Juettner, Marcel Wolf, Arcadiy Ivanov, Valentin Haenel',
+        author_email = 'alexander.metzner@gmail.com, max@riehl.io, aelgru@gmail.com, udo.juettner@gmail.com, marcel.wolf@me.com, arcadiy@ivanov.biz, valentin@haenel.co',
+        license = 'Apache License',
+        url = 'http://pybuilder.github.io',
+        scripts = ['scripts/pyb'],
+        packages = [
+            'pybuilder',
+            'pybuilder.pluginhelper',
+            'pybuilder.plugins',
+            'pybuilder.plugins.python'
+        ],
+        namespace_packages = [],
+        py_modules = [],
+        classifiers = [
+            'Programming Language :: Python',
+            'Programming Language :: Python :: Implementation :: CPython',
+            'Programming Language :: Python :: Implementation :: PyPy',
+            'Programming Language :: Python :: 2',
+            'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.4',
+            'Programming Language :: Python :: 3.5',
+            'Programming Language :: Python :: 3.6',
+            'Programming Language :: Python :: 3.7',
+            'Development Status :: 4 - Beta',
+            'Environment :: Console',
+            'Intended Audience :: Developers',
+            'License :: OSI Approved :: Apache Software License',
+            'Topic :: Software Development :: Build Tools',
+            'Topic :: Software Development :: Quality Assurance',
+            'Topic :: Software Development :: Testing'
+        ],
+        entry_points = {
+            'console_scripts': ['pyb_ = pybuilder.cli:main']
+        },
+        data_files = [],
+        package_data = {
+            'pybuilder': ['LICENSE']
+        },
+        install_requires = [
+            'pip~=9.0',
+            'setuptools~=36.5',
+            'tailer~=0.4',
+            'tblib',
+            'wheel~=0.30'
+        ],
+        dependency_links = [],
+        zip_safe = True,
+        cmdclass = {'install': install},
+        keywords = '',
+        python_requires = '!=3.0,!=3.1,!=3.2,!=3.3,<3.8,>=2.7',
+        obsoletes = [],
+    )

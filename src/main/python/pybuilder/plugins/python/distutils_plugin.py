@@ -141,6 +141,7 @@ def initialize_distutils_plugin(project):
 
 @after("prepare")
 def set_description(project, logger):
+
     if project.get_property("distutils_readme_description"):
         try:
             assert_can_execute(["pandoc", "--version"], "pandoc", "distutils")

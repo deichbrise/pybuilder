@@ -171,7 +171,7 @@ def execute_command(command_and_arguments, outfile_name=None, env=None, cwd=None
 
     out_file = open(outfile_name, "w", opener=_temp_opener) if outfile_name else None
     try:
-        error_file = open(error_file_name, "w") if error_file_name else None
+        error_file = open(error_file_name, "w", opener=_temp_opener) if error_file_name else None
         try:
             process = Popen(command_and_arguments,
                             stdout=out_file,
