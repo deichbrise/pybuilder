@@ -165,7 +165,7 @@ def _install_external_plugin(project, name, version, logger, plugin_module_name,
         pip_package = name.replace(VCS_PLUGIN_PROTOCOL, "")
         force_reinstall = True
 
-    with tempfile.NamedTemporaryFile(mode="rw+b", delete=True) as log_file:
+    with tempfile.NamedTemporaryFile(mode="r+", delete=True) as log_file:
 
         result = pip_utils.pip_install(
             install_targets=pip_package,
